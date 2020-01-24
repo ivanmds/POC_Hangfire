@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  poc_hangfire:
+    image: ${DOCKER_REGISTRY-}pochangfire
+    build:
+      context: .
+      dockerfile: POC_Hangfire/Dockerfile
+    depends_on:
+      - redis
+
+  redis:
+    image: redis
+    ports: 
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
