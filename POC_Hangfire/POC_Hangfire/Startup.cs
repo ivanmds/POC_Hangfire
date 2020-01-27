@@ -6,19 +6,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
-using System;
 
 namespace POC_Hangfire
 {
     public class Startup
     {
-        public static ConnectionMultiplexer Redis;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            var redisConnection = "redis:6379";
-            Redis = ConnectionMultiplexer.Connect(redisConnection);
         }
 
         public IConfiguration Configuration { get; }
@@ -28,17 +23,14 @@ namespace POC_Hangfire
         {
             services.AddControllers();
 
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseRedisStorage(Redis, new RedisStorageOptions
-                {
-                    Prefix = "poc:hangfire"
-                }));
-
-            services.AddHangfireServer();
-
+            services.AddHangfire(configuration =>
+                   configuration.UseRedisStorage(
+                       ConnectionMultiplexer.Connect("redis"),
+                       new RedisStorageOptions()
+                       {
+                           Prefix = "poc:"
+                       }))
+               .AddHangfireServer();
         }
 
 
@@ -61,13 +53,8 @@ namespace POC_Hangfire
                 endpoints.MapControllers();
             });
 
+            //app.UseHangfireServer();
             app.UseHangfireDashboard();
-            app.UseHangfireServer();
-            //app.UseMvc();
-
-            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire! 1"));
-            backgroundJobs.Schedule(() => Console.WriteLine("Hello world from Hangfire! 2"), TimeSpan.FromSeconds(1));
-            backgroundJobs.Schedule(() => Console.WriteLine("Hello world from Hangfire! 3"), DateTimeOffset.FromUnixTimeSeconds(1));
         }
     }
 }
