@@ -1,4 +1,6 @@
 using Hangfire;
+using Hangfire.Annotations;
+using Hangfire.Dashboard;
 using Hangfire.Redis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
+using System.Collections.Generic;
 
 namespace POC_Hangfire
 {
@@ -25,7 +28,7 @@ namespace POC_Hangfire
 
             services.AddHangfire(configuration =>
                    configuration.UseRedisStorage(
-                       ConnectionMultiplexer.Connect("redis"),
+                       ConnectionMultiplexer.Connect("redis:6379"),
                        new RedisStorageOptions()
                        {
                            Prefix = "poc:"
@@ -54,7 +57,17 @@ namespace POC_Hangfire
             });
 
             //app.UseHangfireServer();
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard(options: new DashboardOptions() { 
+               Authorization = new IDashboardAuthorizationFilter[] { new HangFireAuthorizationFilter() }
+            });
+        }
+
+        public class HangFireAuthorizationFilter : IDashboardAuthorizationFilter
+        {
+            public bool Authorize([NotNull] DashboardContext context)
+            {
+                return true;
+            }
         }
     }
 }
