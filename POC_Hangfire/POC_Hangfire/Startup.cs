@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
-using System.Collections.Generic;
 
 namespace POC_Hangfire
 {
@@ -56,7 +55,6 @@ namespace POC_Hangfire
                 endpoints.MapControllers();
             });
 
-            //app.UseHangfireServer();
             app.UseHangfireDashboard(options: new DashboardOptions() { 
                Authorization = new IDashboardAuthorizationFilter[] { new HangFireAuthorizationFilter() }
             });
