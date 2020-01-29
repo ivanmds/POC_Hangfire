@@ -1,3 +1,5 @@
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Hangfire;
 using Hangfire.Annotations;
 using Hangfire.Dashboard;
@@ -7,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using POC_Hangfire.Configurations;
+using POC_Hangfire.Repositories;
 using StackExchange.Redis;
 
 namespace POC_Hangfire
@@ -24,6 +28,23 @@ namespace POC_Hangfire
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            
+           
+
+
+            services.AddSingleton<IAmazonDynamoDB>(x =>
+            {
+                var clientConfig = new AmazonDynamoDBConfig { ServiceURL = "http://dynamodb:8000" };
+
+                return new AmazonDynamoDBClient("root", "secret", clientConfig);
+            });
+
+            services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
+            services.AddSingleton<IRegisterTables, RegisterTables>();
+            services.AddSingleton<ICarRepository, CarRepository>();
+
+
+            services.AddAsyncInitializer<MyAsyncInitializer>();
 
             services.AddHangfire(configuration =>
                    configuration.UseRedisStorage(
