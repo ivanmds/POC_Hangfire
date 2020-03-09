@@ -28,7 +28,7 @@ namespace POC_Hangfire.Repositories
                 TableName = TABLE_NAME,
                 AttributeDefinitions = new List<AttributeDefinition>()
                 {
-                     new AttributeDefinition("Id", ScalarAttributeType.S)
+                     new AttributeDefinition("Id", ScalarAttributeType.N)
                 },
                 KeySchema = new List<KeySchemaElement>()
                 {

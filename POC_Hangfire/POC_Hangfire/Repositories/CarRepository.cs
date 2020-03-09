@@ -11,7 +11,7 @@ namespace POC_Hangfire.Repositories
         public CarRepository(IDynamoDBContext context)
             => _context = context;
 
-        public async Task<Car> GetAsync(string id)
+        public async Task<Car> GetAsync(int id)
         {
             return await _context.LoadAsync<Car>(id);
         }
